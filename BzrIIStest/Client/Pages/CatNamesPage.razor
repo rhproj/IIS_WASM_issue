@@ -1,0 +1,37 @@
+﻿@inject HttpClient httpClient
+@page "/CatNamesPage"
+@using System.Text.Json;
+
+<h1>CatNames:</h1>
+
+<ul class="h3">
+    @foreach (var c in catNamesList)
+    {
+        <li>@c</li>
+    }
+</ul>
+
+
+@code {
+    private List<string> catNamesList = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            catNamesList = await httpClient.GetFromJsonAsync<List<string>>($"api/Values");
+
+            //option 2
+            //catNamesList = await JsonSerializer.DeserializeAsync<List<string>>(await httpClient.GetStreamAsync($"api/Values")); 
+
+            //option 3
+            //var catN = await httpClient.GetAsync($"api/Values");
+            //catNamesList = await catN.Content.ReadFromJsonAsync<List<string>>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+}
