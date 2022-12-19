@@ -1,9 +1,39 @@
-﻿@page "/"
+﻿@inject HttpClient httpClient
+@page "/"
+@using System.Text.Json;
 
-<PageTitle>Index</PageTitle>
+<p class="fs-3 text-primary">Please, see if it works as published app in your IIS</p>
+<p class="fs-5 text-secondary">It works by express version and published to Kestrel but not to IIS (windows 10) :(</p>
+<h1>Cat Names:</h1>
 
-<h1>Hello, world!</h1>
+<ul class="h3">
+    @foreach (var c in catNamesList)
+    {
+        <li>@c</li>
+    }
+</ul>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    private List<string> catNamesList = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            catNamesList = await httpClient.GetFromJsonAsync<List<string>>($"api/Values");
+
+            //option 2
+            //catNamesList = await JsonSerializer.DeserializeAsync<List<string>>(await httpClient.GetStreamAsync($"api/Values"));
+
+            //option 3
+            //var catN = await httpClient.GetAsync($"api/Values");
+            //catNamesList = await catN.Content.ReadFromJsonAsync<List<string>>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
+
